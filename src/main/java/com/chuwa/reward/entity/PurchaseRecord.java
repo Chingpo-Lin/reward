@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -19,14 +19,17 @@ public class PurchaseRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "amount", nullable = false)
     private Double amount;
 
+    @Column(name = "points", nullable = false)
+    private Integer points;
+
     @CreationTimestamp
-    private LocalDateTime createDateTime;
+    private LocalDate createDateTime;
 
 }
