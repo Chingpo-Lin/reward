@@ -30,6 +30,7 @@ public class CustomExceptionHandler {
         } else if (e instanceof MethodArgumentNotValidException) {
             Map<String, String> errors = new HashMap<>();
             MethodArgumentNotValidException exception = (MethodArgumentNotValidException) e;
+            log.error("[validation exception] happened(" + new Date() + "):", e);
             exception.getBindingResult().getAllErrors().forEach((error) -> {
                 String fieldName = ((FieldError) error).getField();
                 String message = error.getDefaultMessage();

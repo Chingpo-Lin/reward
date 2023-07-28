@@ -121,8 +121,6 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
 
     public List<PurchaseRecord> getPurchaseRecordsByDateRange(LocalDate startDate, LocalDate endDate) {
 
-        log.info("start date:", startDate);
-        log.info("end date:", endDate);
         List<PurchaseRecord> purchaseRecords = purchaseRecordRepository
                 .findPurchaseRecordsBetweenDate(startDate, endDate);
 
