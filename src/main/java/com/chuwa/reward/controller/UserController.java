@@ -4,7 +4,13 @@ import com.chuwa.reward.payload.UserDto;
 import com.chuwa.reward.payload.UserResponse;
 import com.chuwa.reward.service.UserService;
 import com.chuwa.reward.utils.AppConstants;
+import com.chuwa.reward.utils.CommonUtils;
 import com.chuwa.reward.utils.JsonData;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,7 +37,7 @@ public class UserController {
         UserDto result = userService.createUser(userDto);
         httpServletResponse.setStatus(HttpStatus.CREATED.value());
         log.debug("Respond Post /api/v1/users with: {}", result);
-        return JsonData.buildSuccess(result);
+        return JsonData.buildSuccess(CommonUtils.encode(result));
     }
 
     @GetMapping()
@@ -39,7 +46,35 @@ public class UserController {
         List<UserDto> userDtoList = userService.getAllUser();
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Get /api/v1/users with: {}", userDtoList);
-        return JsonData.buildSuccess(userDtoList);
+        return JsonData.buildSuccess(CommonUtils.encode(userDtoList));
+    }
+
+    @GetMapping("pdf")
+    public void generateAllUserNamePDF(HttpServletResponse response) throws DocumentException, IOException {
+        // Set the response content type for PDF
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=\"alluser.pdf\"");
+        Cookie cookie = new Cookie("myCookie", "cookieValue");
+        cookie.setMaxAge(3600); // Set cookie's age in seconds (1 hour in this case)
+
+        // Add the cookie to the response
+        response.addCookie(cookie);
+
+        // Create a new PDF document
+        Document document = new Document();
+        PdfWriter.getInstance(document, response.getOutputStream());
+        List<UserDto> userDtoList = userService.getAllUser();
+        // Open the document
+        try {
+            document.open();
+        } catch (Exception e) {
+            for (UserDto userDto: userDtoList) {
+                Paragraph paragraph = new Paragraph("user: " + userDto.getUsername());
+                document.add(paragraph);
+            }
+        } finally {
+            document.close();
+        }
     }
 
     @GetMapping("page")
@@ -54,7 +89,7 @@ public class UserController {
         UserResponse userResponse = userService.getAllUser(pageNo, pageSize, sortBy, sortDir);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Get /api/v1/records/page with: {}", userResponse);
-        return JsonData.buildSuccess(userResponse);
+        return JsonData.buildSuccess(CommonUtils.encode(userResponse));
     }
 
     @GetMapping("/{id}")
@@ -63,7 +98,7 @@ public class UserController {
         UserDto userDto = userService.getUserById(id);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Get /api/v1/records/{id} with: {}", userDto);
-        return JsonData.buildSuccess(userDto);
+        return JsonData.buildSuccess(CommonUtils.encode(userDto));
     }
 
     @PutMapping("/{id}")
@@ -73,7 +108,7 @@ public class UserController {
         UserDto updateUser = userService.updateUser(userDto, id);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Put /api/v1/records/{id} with: {}", updateUser);
-        return JsonData.buildSuccess(updateUser);
+        return JsonData.buildSuccess(CommonUtils.encode(updateUser));
     }
 
     @DeleteMapping("/{id}")
