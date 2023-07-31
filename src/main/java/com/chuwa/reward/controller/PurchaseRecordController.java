@@ -3,6 +3,7 @@ package com.chuwa.reward.controller;
 import com.chuwa.reward.payload.*;
 import com.chuwa.reward.service.PurchaseRecordService;
 import com.chuwa.reward.utils.AppConstants;
+import com.chuwa.reward.utils.CommonUtils;
 import com.chuwa.reward.utils.JsonData;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -29,7 +30,7 @@ public class PurchaseRecordController {
 
         httpServletResponse.setStatus(HttpStatus.CREATED.value());
         log.debug("Respond Post /api/v1/records with: {}", result);
-        return JsonData.buildSuccess(result);
+        return JsonData.buildSuccess(CommonUtils.encode(result));
     }
 
     @GetMapping()
@@ -38,7 +39,7 @@ public class PurchaseRecordController {
         List<PurchaseRecordDto> purchaseRecordDtos = purchaseRecordService.getAllRecord();
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Get /api/v1/records with: {}", purchaseRecordDtos);
-        return JsonData.buildSuccess(purchaseRecordDtos);
+        return JsonData.buildSuccess(CommonUtils.encode(purchaseRecordDtos));
     }
 
     @GetMapping("page")
@@ -53,7 +54,7 @@ public class PurchaseRecordController {
         PurchaseRecordResponse purchaseRecordResponse = purchaseRecordService.getAllRecord(pageNo, pageSize, sortBy, sortDir);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Get /api/v1/records/page with: {}", purchaseRecordResponse);
-        return JsonData.buildSuccess(purchaseRecordResponse);
+        return JsonData.buildSuccess(CommonUtils.encode(purchaseRecordResponse));
     }
 
     @GetMapping("/{id}")
@@ -62,7 +63,7 @@ public class PurchaseRecordController {
         PurchaseRecordDto purchaseRecordDto = purchaseRecordService.getRecordById(id);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond Get /api/v1/records/{id} with: {}", purchaseRecordDto);
-        return JsonData.buildSuccess(purchaseRecordDto);
+        return JsonData.buildSuccess(CommonUtils.encode(purchaseRecordDto));
     }
 
     /**
@@ -81,6 +82,6 @@ public class PurchaseRecordController {
                 .getUserRecordByDateRange(dateRequest.getStartDate(), dateRequest.getEndDate());
         httpServletResponse.setStatus(HttpStatus.OK.value());
         log.debug("Respond  Get /api/v1/records/search with: {}", userPointVOS);
-        return JsonData.buildSuccess(userPointVOS);
+        return JsonData.buildSuccess(CommonUtils.encode(userPointVOS));
     }
 }
